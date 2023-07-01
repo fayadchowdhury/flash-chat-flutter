@@ -15,12 +15,12 @@ class FlashChat extends StatelessWidget {
           bodyLarge: TextStyle(color: Colors.black54),
         ),
       ),
-      initialRoute: "/welcome", // Another way to start on a specified screen is to use the initialRoute property of MaterialApp; make sure to use named routes in the routes property as well.
+      initialRoute: WelcomeScreen.routeId, // Another way to start on a specified screen is to use the initialRoute property of MaterialApp; make sure to use named routes in the routes property as well.
       routes: {
-        "/chat": (context) => ChatScreen(),
-        "/login": (context) => LoginScreen(),
-        "/registration": (context) => RegistrationScreen(),
-        "/welcome": (context) => WelcomeScreen(),
+        ChatScreen.routeId: (context) => ChatScreen(),
+        LoginScreen.routeId: (context) => LoginScreen(),
+        RegistrationScreen.routeId: (context) => RegistrationScreen(),
+        WelcomeScreen.routeId: (context) => WelcomeScreen(),
       },
     );
   }
