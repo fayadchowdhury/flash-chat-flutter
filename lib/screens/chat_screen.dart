@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
@@ -13,6 +16,9 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
 
   late User loggedInUser;
+  late String message;
+  late TextEditingController messageTextController;
+  late FirebaseFirestore _messagesDb;
 
   void getCurrentUser() async {
     try {
@@ -33,6 +39,8 @@ class _ChatScreenState extends State<ChatScreen> {
     // TODO: implement initState
     super.initState();
     getCurrentUser();
+    messageTextController = TextEditingController();
+    _messagesDb = FirebaseFirestore.instance;
   }
 
 
@@ -63,15 +71,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
-                      onChanged: (value) {
-                        //Do something with the user input.
-                      },
+                      controller: messageTextController,
                       decoration: kMessageTextFieldDecoration,
                     ),
                   ),
                   TextButton(
                     onPressed: () {
-                      //Implement send functionality.
+                      try {
+                        message = messageTextController.text;
+                        String email = loggedInUser.email!;
+                        Map<String, String> messageData = {
+                          "sender": email,
+                          "text": message
+                        };
+                        _messagesDb.collection("messages").add(messageData);
+                      }
+                      catch (e) {
+                        print(e);
+                      }
                     },
                     child: Text(
                       'Send',
@@ -85,5 +102,12 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    messageTextController.dispose();
+    super.dispose();
   }
 }
