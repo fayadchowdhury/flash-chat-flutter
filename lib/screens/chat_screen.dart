@@ -34,6 +34,29 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // This will fetch data from Firestore once it is called
+  void getMessages() async
+  {
+    final messages = await _messagesDb.collection("messages").get().then(
+        (querySnapshot) {
+          for ( var doc in querySnapshot.docs) {
+            print(doc.data());
+          }
+        }
+    );
+  }
+
+  // This will listen for changes in Firestore and pull in snapshots (entire collection) once there is a change
+  // Bit like Firestore pushing data to the app instead of the app pulling data from Firestore
+  void getMessagesStream() async {
+    // Involves Streams
+    await for ( var snapshot in _messagesDb.collection("messages").snapshots() ) {
+      for ( var doc in snapshot.docs ) {
+        print(doc.data());
+      }
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -41,6 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
     messageTextController = TextEditingController();
     _messagesDb = FirebaseFirestore.instance;
+    getMessagesStream();
   }
 
 
