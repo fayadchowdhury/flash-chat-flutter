@@ -51,7 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void getMessagesStream() async {
     // Involves Streams
     await for ( var snapshot in _messagesDb.collection("messages").snapshots() ) {
-      for ( var doc in snapshot.docs ) {
+      for ( var doc in snapshot.docs ) { // Each doc here is a JsonQueryDocumentSnapshot
         print(doc.data());
       }
     }
@@ -64,7 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
     messageTextController = TextEditingController();
     _messagesDb = FirebaseFirestore.instance;
-    getMessagesStream();
+    // getMessagesStream();
   }
 
 
@@ -88,6 +88,30 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>( // It is a good idea to specify what the stream type is going to be (QuerySnapshot)
+              stream: _messagesDb.collection("messages").snapshots(), // Subscribe to this stream (returns a Stream<QuerySnapshot>)
+              builder: (context, snapshot) { // Requires a context and allows access to snapshot
+                List<Text> messageWidgets = [];
+                if ( snapshot.hasData ) { // Check to see if snapshot has data or not
+                  final messages = snapshot.data!.docs; // Access null-safe snapshot data
+                  for ( var message in messages ) { // Each message is a JsonQueryDocumentSnapshot
+                    final messageText = message.get("text"); // This is how we access fields within the JsonQueryDocumentSnapshot
+                    final messageSender = message.get("sender");
+                    messageWidgets.add(
+                        Text("$messageText from $messageSender") // Add Text widget with relevant text
+                    );
+                  }
+                  return Column(
+                    children: messageWidgets,
+                  );
+                }
+                else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
