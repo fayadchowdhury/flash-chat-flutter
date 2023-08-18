@@ -19,6 +19,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late String message;
   late TextEditingController messageTextController;
   late FirebaseFirestore _messagesDb;
+  late FirebaseAuth _auth;
 
   void getCurrentUser() async {
     try {
@@ -61,6 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _auth = FirebaseAuth.instance;
     getCurrentUser();
     messageTextController = TextEditingController();
     _messagesDb = FirebaseFirestore.instance;
@@ -77,7 +79,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                //Implement logout functionality
+                _auth.signOut();
+                Navigator.pop(context);
               }),
         ],
         title: Text('⚡️Chat'),
