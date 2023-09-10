@@ -112,6 +112,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           "text": message
                         };
                         _messagesDb.collection("messages").add(messageData);
+                        messageTextController.clear();
                       }
                       catch (e) {
                         print(e);
