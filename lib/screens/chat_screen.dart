@@ -1,9 +1,9 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
+
+import 'package:flash_chat/components/message_stream.dart';
 
 class ChatScreen extends StatefulWidget {
 
@@ -26,7 +26,6 @@ class _ChatScreenState extends State<ChatScreen> {
       final currentUser = await FirebaseAuth.instance.currentUser;
       if ( currentUser != null ) {
         loggedInUser = currentUser;
-        print(loggedInUser.email);
       }
     }
     catch (e)
@@ -91,30 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            StreamBuilder<QuerySnapshot>( // It is a good idea to specify what the stream type is going to be (QuerySnapshot)
-              stream: _messagesDb.collection("messages").snapshots(), // Subscribe to this stream (returns a Stream<QuerySnapshot>)
-              builder: (context, snapshot) { // Requires a context and allows access to snapshot
-                List<Text> messageWidgets = [];
-                if ( snapshot.hasData ) { // Check to see if snapshot has data or not
-                  final messages = snapshot.data!.docs; // Access null-safe snapshot data
-                  for ( var message in messages ) { // Each message is a JsonQueryDocumentSnapshot
-                    final messageText = message.get("text"); // This is how we access fields within the JsonQueryDocumentSnapshot
-                    final messageSender = message.get("sender");
-                    messageWidgets.add(
-                        Text("$messageText from $messageSender") // Add Text widget with relevant text
-                    );
-                  }
-                  return Column(
-                    children: messageWidgets,
-                  );
-                }
-                else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            ),
+            MessageStream(messagesDb: _messagesDb),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
